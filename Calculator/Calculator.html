@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+	<head>
+		<title>JavaScript Calculator</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Pragma" content="no-cache"> 
+		 <!-- Latest compiled and minified CSS -->
+    	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+    	<!-- Optional theme -->
+    	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    	<link href="style.css" rel="stylesheet">
+		<style>
+			input {
+				font-size : 18px;
+			}
+		</style>
+		<script type="text/javascript">
+			var previous = "0";
+			var current = "0";
+			var prevoperator = 'add';
+			var previousclick = '';
+			var currentop = '';
+			var exp = '';
+			
+			function numberButton(number)
+			{
+				var current = document.getElementById("displayresult").value;
+				if (current == '0' || previousclick == 'op' || currentop == 'equals')
+				{
+					document.getElementById("displayresult").value = number;
+					previousclick = '';
+					currentop = '';
+				} 
+				else {
+					var num = document.getElementById("displayresult").value;
+					if (num.length > 10)
+						displayError("OVERFLOW");
+					else
+						document.getElementById("displayresult").value += number;
+				}
+			}
+			
+			function reset()
+			{
+				document.getElementById("displayresult").value = '0'; 
+				clear();
+			}
+			function clear()
+			{
+				previous = "0";
+			    current = "0";
+			    prevoperator = 'add';
+			    previousclick = '';
+			}
+			
+			function operatorButton(curroperator)
+			{		
+				if (currentop != 'equals')
+				{
+					current = document.getElementById("displayresult").value;
+					if (previousclick == "op") {
+						prevoperator = curroperator;
+					}
+					else {
+						previousclick = "op";
+					
+						switch (prevoperator)
+						{
+							case 'add':
+								exp = previous + "+" + current;
+								break;
+
+							case 'subtract':
+								exp = previous + "-" + current;
+								break;	
+
+							case 'multiply':
+								if(previous.length>current.length? 9007199254740992/parseInt(previous) < parseInt(current) : 9007199254740992/parseInt(current) < parseInt(previous))
+								{
+									displayError("OVERFLOW");
+								}
+								else
+									exp = previous + "*" + current;
+								break;	
+
+							case 'divide':
+								if ( current == "0")
+								{
+									exp = null;
+									displayError("ERROR");
+								} else {
+									exp = previous + "/" + current;
+								}
+								break;		
+						}
+						var expression = exp.toString();
+						var temp = parseInt(eval(expression));	
+						
+						if (temp.toString()[0] != '-' ? temp.toString().length > 10 : temp.toString().length > 11) {
+							displayError('OVERFLOW');
+							return false;
+						} else {
+							current = temp.toString();
+						}
+						previous = current;
+						document.getElementById("displayresult").value = current;
+						if (curroperator == 'equals') {
+							currentop = curroperator;
+							clear();
+						} else {
+							prevoperator = curroperator;
+						}	
+					}
+				}
+			}
+			
+			function displayError(message)
+			{
+				current = message;
+				document.getElementById("displayresult").value = current;
+				var buttons = document.getElementsByName("calcbutton");
+				for (var i = 0; i < buttons.length; i++){
+					buttons[i].disabled = true;
+				}
+				clear();
+				return false;
+			}
+		</script>
+	</head>
+	<body>
+		<div class="navbar navbar-inverse" align="center">
+      		<div class="navbar-inner">
+        		<div class="container" >
+        			<img src="Logo.png">
+          			<a class="brand" href="#" style="font-size : 29px;">Basic Calculator</a>
+        		</div>
+        	</div>
+        </div>  
+        <br><br>
+		<div class="container" id="calc-container" align="center">
+			<table border="0" cellpadding="2" cellspacing="2">
+				<tr>
+					<td colspan="2">
+						<input id="displayresult" placeholder = "0" disabled type="text" value = "0" autocomplete='off'> 
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="7" onclick="numberButton(7)" >
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="8" onclick="numberButton(8)" >
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="9" onclick="numberButton(9)">
+						<input class="btn btn-primary btn-lg" name="calcbutton" type="button" value="+" onclick="operatorButton('add')">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="1">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="4" onclick="numberButton(4)">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="5" onclick="numberButton(5)">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="6" onclick="numberButton(6)">
+						<input class="btn btn-primary btn-lg" name="calcbutton" type="button" value="&nbsp-" onclick="operatorButton('subtract')">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="1" onclick="numberButton(1)">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="2" onclick="numberButton(2)">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="3" onclick="numberButton(3)">
+						<input class="btn btn-primary btn-lg" name="calcbutton" type="button" value="&nbsp*" onclick="operatorButton('multiply')">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input class="btn btn-primary btn-lg" name="calcbutton" type="button" value="C" onclick="reset()">
+						<input class="btn btn-default btn-lg" name="calcbutton" type="button" value="0" onclick="numberButton(0)">
+						<input class="btn btn-primary btn-lg" name="calcbutton" type="button" value="=" onclick="operatorButton('equals')">
+						<input class="btn btn-primary btn-lg" name="calcbutton" type="button" value="/" onclick="operatorButton('divide')">
+					</td>
+				</tr>
+
+			</table>	
+		</div>	
+		<br><br><br>
+		<div class="container" id="details-container" align="center">
+			This Calculator computes simple addition, subtraction, multiplication and division operations. It handles computations upto 10 digits.
+			<br>Logo: http://etc-mysitemyway.s3.amazonaws.com/icons/
+		</div>	
+
+		 <!-- Bootstrap core JavaScript -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+	</body>
+</html>
